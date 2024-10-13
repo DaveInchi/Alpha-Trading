@@ -46,6 +46,7 @@ def calc_atr(stock_data, day_period):
 
     print(list_atr_dollars)
     print("Days: " +  str(len(list_atr_dollars)))
+    return list_atr_dollars
 
 
 
