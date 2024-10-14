@@ -1,7 +1,7 @@
 import json
 import requests
-from atr_calc import calc_atr
-from hystory_data_loader import get_hystory_data
+from utils.atr_calc import calc_atr
+from utils.hystory_data_loader import get_hystory_data
 
 
 in_position = False
