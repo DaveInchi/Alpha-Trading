@@ -35,22 +35,17 @@ def calc_atr(stock_data, day_period):
                 else:
                      break
 
-                
-
-
         atr_perc = round(tr_sum / day_period, 2)
         atr_dollars = round((atr_perc / 100) * stock_data[j]['close'], 2)
         list_atr_dollars.append(atr_dollars)
 
         j += 1
-
-    print(list_atr_dollars)
-    print("Days: " +  str(len(list_atr_dollars)))
+        
     return list_atr_dollars
 
 
 
 
 
-stockdata = get_hystory_data('SPY', 2)
-calc_atr(stockdata, s1_days)
+#stockdata = get_hystory_data('SPY', 2)
+#calc_atr(stockdata, s1_days)
