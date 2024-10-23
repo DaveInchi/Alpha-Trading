@@ -1,6 +1,6 @@
 import json
 import requests
-from hystory_data_loader import get_hystory_data
+from utils.hystory_data_loader import get_hystory_data
 
 list_atr_dollars = []
 s1_days = 20
@@ -23,29 +23,26 @@ def calc_tr(stock_data, day):
         return 0
 
 def calc_atr(stock_data, day_period): 
-    j = 0 
-    while j + day_period - 1 < len(stock_data): 
-        tr_sum = 0
-        list_tr = []
-        for i in range(0, day_period):
-                if(i + j < len(stock_data)):
-                    tr = calc_tr(stock_data, i + j)
-                    list_tr.append(tr)
-                    tr_sum += tr
-                else:
-                     break
+    tr_sum = 0
+    list_tr = []
+    for i in range(0, int(day_period)):
+            if(i < len(stock_data)):
+                tr = calc_tr(stock_data, i)
+                list_tr.append(tr)
+                tr_sum += tr
+            else:
+                    break
 
-        atr_perc = round(tr_sum / day_period, 2)
-        atr_dollars = round((atr_perc / 100) * stock_data[j]['close'], 2)
-        list_atr_dollars.append(atr_dollars)
-
-        j += 1
+    atr_perc = round(tr_sum / day_period, 2)
+    atr_dollars = round((atr_perc / 100) * stock_data[-1]['close'], 2)
         
-    return list_atr_dollars
+    #print(list_atr_dollars)
+    return atr_dollars
 
 
 
 
 
-#stockdata = get_hystory_data('SPY', 2)
-#calc_atr(stockdata, s1_days)
+#stockdata = get_hystory_data('SPY', 1)
+#reversed_stockdata = stockdata[::-1]
+#calc_atr(reversed_stockdata, s1_days)
