@@ -25,7 +25,7 @@ def get_highest_price(stock_data, day_period):
 def get_lowest_price(stock_data, day_period):
     lowest_price = 1000000
     for i in range(0, day_period - 1):
-        if(stock_data[i]['close'] > lowest_price):
+        if(stock_data[i]['close'] < lowest_price):
             lowest_price = stock_data[i]['close']
     return lowest_price
 
@@ -58,7 +58,7 @@ def set_implied_stop_short(stock_data, day_period):
     array = []
     for i in range(0, (day_period - 1)):
         array.append(stock_data[i]['close'])
-    array = array[int(len(array) / 2): ]
+    array = array[int(len(array) / 2):]
     return max(array)
 
 
@@ -97,6 +97,7 @@ def entry_short_check(stock_data, day_period, capital, num_of_shares, r_perc):
     global in_position_short, short_stop_loss_price, short_implied_stop_price
 
     lowest_price = get_lowest_price(stock_data, day_period)
+
     if(stock_data[-1]['close'] <= lowest_price):
         in_position_short = True
 
@@ -114,7 +115,7 @@ def entry_short_check(stock_data, day_period, capital, num_of_shares, r_perc):
         print("Go in and don't look back! Costs: " + str(costs))
         print("Stop loss: " + str(short_stop_loss_price) + " Implied Stop: " + str(short_implied_stop_price))
         print("And this is how much I have left: " + str(capital))
-        print("I am in this sh!t for short!!!!")
+        print("Short hoes never a problem!!!!")
         print("------------------------------")
 
     return [in_position_short, short_stop_loss_price, short_implied_stop_price, capital, num_of_shares]
@@ -131,7 +132,7 @@ def exit_long_check(stock_data, capital, num_of_shares):
         num_of_shares = 0
         print("Today's close price: " + str(stock_data[-1]['close']) + "  Today's date: " + stock_data[-1]['date'][0:10] + " In position: " + str(in_position_long))
         print("Stop loss hit: " + str(long_stop_loss_price))
-        print("Go out while you can!)")
+        print("Go out while you can, exited long trade!)")
         print("My capital is now: " + str(capital))
         print("------------------------------")
         long_stop_loss_price = 0
@@ -142,7 +143,7 @@ def exit_long_check(stock_data, capital, num_of_shares):
         num_of_shares = 0
         print("Today's close price: " + str(stock_data[-1]['close']) + "  Today's date: " + stock_data[-1]['date'][0:10] + " In position: " + str(in_position_long))
         print("Implied stop hit: " + str(long_implied_stop_price))
-        print("Go out while you can!)")
+        print("Go out while you can, exited long trade!)")
         print("My capital is now: " + str(capital))
         print("------------------------------")
         long_implied_stop_price = 0
@@ -162,7 +163,7 @@ def exit_short_check(stock_data, capital, num_of_shares):
         num_of_shares = 0
         print("Today's close price: " + str(stock_data[-1]['close']) + "  Today's date: " + stock_data[-1]['date'][0:10] + " In position: " + str(in_position_short))
         print("Stop loss hit: " + str(short_stop_loss_price))
-        print("Go out while you can!)")
+        print("Go out while you can, exited short trade!)")
         print("My capital is now: " + str(capital))
         print("------------------------------")
         short_stop_loss_price = 0
@@ -173,7 +174,7 @@ def exit_short_check(stock_data, capital, num_of_shares):
         num_of_shares = 0
         print("Today's close price: " + str(stock_data[-1]['close']) + "  Today's date: " + stock_data[-1]['date'][0:10] + " In position: " + str(in_position_short))
         print("Implied stop hit: " + str(short_implied_stop_price))
-        print("Go out while you can!)")
+        print("Go out while you can, exited long trade!)")
         print("My capital is now: " + str(capital))
         print("------------------------------")
         short_implied_stop_price = 0
