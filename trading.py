@@ -12,6 +12,9 @@ short_stop_loss_price = 0
 short_implied_stop_price = 0
 comission = 0
 
+last_ent_p = 0
+counter = 0
+
 # Returns the highest closing price within the specified day period.
 def get_highest_price(stock_data, day_period):
     highest_price = 0
@@ -64,13 +67,14 @@ def set_implied_stop_short(stock_data, day_period):
 
 
 def entry_long_check(stock_data, day_period, capital, num_of_shares, r_perc):
-    global in_position_long, long_stop_loss_price, long_implied_stop_price
+    global in_position_long, long_stop_loss_price, long_implied_stop_price, last_ent_p, counter
 
     highest_price = get_highest_price(stock_data, day_period - 1)
     
     
     if(stock_data[-1]['close'] >= highest_price):
         in_position_long = True
+        last_ent_p = stock_data[-1]['close']
 
         if(capital > 0):
             atr = calc_atr(stock_data, day_period)
@@ -88,18 +92,20 @@ def entry_long_check(stock_data, day_period, capital, num_of_shares, r_perc):
         print("And this is how much I have left: " + str(capital))
         print("I am in this sh!t for long!!!!")
         print("------------------------------")
+        counter += 1
     
 
-    return [in_position_long, long_stop_loss_price, long_implied_stop_price, capital, num_of_shares]
+    return [in_position_long, long_stop_loss_price, long_implied_stop_price, capital, num_of_shares, last_ent_p, counter]
 
 
 def entry_short_check(stock_data, day_period, capital, num_of_shares, r_perc):
-    global in_position_short, short_stop_loss_price, short_implied_stop_price
+    global in_position_short, short_stop_loss_price, short_implied_stop_price, last_ent_p, counter
 
     lowest_price = get_lowest_price(stock_data, day_period)
 
     if(stock_data[-1]['close'] <= lowest_price):
         in_position_short = True
+        last_ent_p = stock_data[-1]['close']
 
         if (capital > 0):
             atr = calc_atr(stock_data, day_period)
@@ -117,14 +123,15 @@ def entry_short_check(stock_data, day_period, capital, num_of_shares, r_perc):
         print("And this is how much I have left: " + str(capital))
         print("Short hoes never a problem!!!!")
         print("------------------------------")
+        counter += 1
 
-    return [in_position_short, short_stop_loss_price, short_implied_stop_price, capital, num_of_shares]
+    return [in_position_short, short_stop_loss_price, short_implied_stop_price, capital, num_of_shares, last_ent_p, counter]
 
 
 
 
 def exit_long_check(stock_data, capital, num_of_shares):
-    global in_position_long, long_stop_loss_price, long_implied_stop_price
+    global in_position_long, long_stop_loss_price, long_implied_stop_price, last_ent_p, counter
 
     if(stock_data[-1]['close'] < long_stop_loss_price):
         in_position_long = False
@@ -136,6 +143,8 @@ def exit_long_check(stock_data, capital, num_of_shares):
         print("My capital is now: " + str(capital))
         print("------------------------------")
         long_stop_loss_price = 0
+        last_ent_p = 0
+        counter = 0
 
     elif(stock_data[-1]['close'] < long_implied_stop_price):
         in_position_long = False
@@ -147,15 +156,17 @@ def exit_long_check(stock_data, capital, num_of_shares):
         print("My capital is now: " + str(capital))
         print("------------------------------")
         long_implied_stop_price = 0
+        counter = 0
+        last_ent_p = 0
 
 
-    return [in_position_long, long_stop_loss_price, long_implied_stop_price, capital, num_of_shares]
+    return [in_position_long, long_stop_loss_price, long_implied_stop_price, capital, num_of_shares, last_ent_p, counter]
 
 
 
 
 def exit_short_check(stock_data, capital, num_of_shares):
-    global in_position_short, short_stop_loss_price, short_implied_stop_price
+    global in_position_short, short_stop_loss_price, short_implied_stop_price, last_ent_p, counter
 
     if(stock_data[-1]['close'] > short_stop_loss_price):
         in_position_short = False
@@ -167,6 +178,8 @@ def exit_short_check(stock_data, capital, num_of_shares):
         print("My capital is now: " + str(capital))
         print("------------------------------")
         short_stop_loss_price = 0
+        counter = 0
+        last_ent_p = 0
 
     elif(stock_data[-1]['close'] > short_implied_stop_price):
         in_position_short = False
@@ -178,12 +191,42 @@ def exit_short_check(stock_data, capital, num_of_shares):
         print("My capital is now: " + str(capital))
         print("------------------------------")
         short_implied_stop_price = 0
+        counter = 0
+        last_ent_p = 0
 
 
-    return [in_position_short, short_stop_loss_price, short_implied_stop_price, capital, num_of_shares]
+    return [in_position_short, short_stop_loss_price, short_implied_stop_price, capital, num_of_shares, last_ent_p, counter]
 
     
+def scaling_long(stock_data, day_period, capital, num_of_shares, r_perc):
+    global in_position_short, long_stop_loss_price, long_implied_stop_price, last_ent_p, counter
 
+    atr = calc_atr(stock_data, day_period)
+    if (counter <= 4):
+        if(stock_data[-1]['close'] >= (last_ent_p + atr * 2)):
+            last_ent_p = stock_data[-1]['close']
+            if (capital > 0):
+                num_of_shares = int((capital * 0.5 * r_perc - comission) / (2 * atr))
+                costs = round(num_of_shares * stock_data[-1]['close'], 2)
+                capital = round(capital - costs, 2)
+
+            long_stop_loss_price = set_stop_loss_long(stock_data, day_period)
+            long_implied_stop_price = set_implied_stop_long(stock_data, day_period)
+
+            #print("Today's close price: " + str(stock_data[-1]['close']) + "  Today's date: " + stock_data[-1]['date'][0:10] + " In position: " + str(in_position_long))
+            #print("Highest price: " + str(highest_price))
+            #print("Go in and don't look back! Costs: " + str(costs))
+            #print("Stop loss: " + str(long_stop_loss_price) + " Implied Stop: " + str(long_implied_stop_price))
+            #print("And this is how much I have left: " + str(capital))
+            #print("I am in this sh!t for long!!!!")
+            print("Scaling long is working bitches!!!!")
+            print("------------------------------")
+            counter += 1
+    
+    return [in_position_long, long_stop_loss_price, long_implied_stop_price, capital, num_of_shares, last_ent_p, counter]
+    
+
+    
 
 
 

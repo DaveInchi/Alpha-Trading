@@ -12,10 +12,13 @@ capital = 500000
 num_of_shares = 0
 r_perc = 0.02
 
+last_ent_p = 0
+counter = 0
+
 
 
 def turtle_check(stock_data, day_period):
-    global stop_loss, implied_stop_price, capital, num_of_shares
+    global stop_loss, implied_stop_price, capital, num_of_shares, last_ent_p, counter 
 
     in_position_long = False
     in_position_short = False
@@ -30,14 +33,40 @@ def turtle_check(stock_data, day_period):
             capital = entry_long_check_params[3]
             num_of_shares = entry_long_check_params[4]
 
+            last_ent_p = entry_long_check_params[5]
+            counter = entry_long_check_params[6]
+
 
             if(in_position_long == True):
-                exit_long_check_params = exit_long_check(stock_data[switch:i], capital, num_of_shares)
-                in_position_long = exit_long_check_params[0]
-                stop_loss = exit_long_check_params[1]
-                implied_stop_price = exit_long_check_params[2]
-                capital = exit_long_check_params[3]
-                num_of_shares = exit_long_check_params[4]
+                scaling_long_params = scaling_long(stock_data[switch:i], day_period, capital, num_of_shares, r_perc)
+                if(scaling_long_params[0] == True):
+                    in_position_long = entry_long_check_params[0]
+                    stop_loss = entry_long_check_params[1]
+                    implied_stop_price = entry_long_check_params[2] 
+                    capital = entry_long_check_params[3]
+                    num_of_shares = entry_long_check_params[4]
+
+                    last_ent_p = entry_long_check_params[5]
+                    counter = entry_long_check_params[6]
+
+                else:
+                    exit_long_check_params = exit_long_check(stock_data[switch:i], capital, num_of_shares)
+                    in_position_long = exit_long_check_params[0]
+                    stop_loss = exit_long_check_params[1]
+                    implied_stop_price = exit_long_check_params[2]
+                    capital = exit_long_check_params[3]
+                    num_of_shares = exit_long_check_params[4]
+
+                    last_ent_p = entry_long_check_params[5]
+                    counter = entry_long_check_params[6]
+
+
+
+
+
+
+
+
 
 
         if(not in_position_long):
