@@ -13,7 +13,8 @@ short_implied_stop_price = 0
 comission = 0
 
 last_ent_p = 0
-counter = 0
+scaling_long_atr = 0
+scaling_short_atr = 0
 
 # Returns the highest closing price within the specified day period.
 def get_highest_price(stock_data, day_period):
@@ -67,7 +68,7 @@ def set_implied_stop_short(stock_data, day_period):
 
 
 def entry_long_check(stock_data, day_period, capital, num_of_shares, r_perc):
-    global in_position_long, long_stop_loss_price, long_implied_stop_price, last_ent_p, counter
+    global in_position_long, long_stop_loss_price, long_implied_stop_price, last_ent_p, scaling_long_atr
 
     highest_price = get_highest_price(stock_data, day_period - 1)
     
@@ -78,6 +79,7 @@ def entry_long_check(stock_data, day_period, capital, num_of_shares, r_perc):
 
         if(capital > 0):
             atr = calc_atr(stock_data, day_period)
+            scaling_long_atr = atr
             num_of_shares = int((capital * 0.5 * r_perc - comission) / (2 * atr))
             costs = round(num_of_shares * stock_data[-1]['close'], 2)
             capital = round(capital - costs, 2)
@@ -85,21 +87,20 @@ def entry_long_check(stock_data, day_period, capital, num_of_shares, r_perc):
         long_stop_loss_price = set_stop_loss_long(stock_data, day_period)
         long_implied_stop_price = set_implied_stop_long(stock_data, day_period)
 
-        print("Today's close price: " + str(stock_data[-1]['close']) + "  Today's date: " + stock_data[-1]['date'][0:10] + " In position: " + str(in_position_long))
+        print("Today's close price: " + str(stock_data[-1]['close']) + "  Today's date: " + stock_data[-1]['date'][0:10] + "  In position long: " + str(in_position_long) + "  This is the first long entry!")
         #print("Highest price: " + str(highest_price))
         print("Go in and don't look back! Costs: " + str(costs))
         print("Stop loss: " + str(long_stop_loss_price) + " Implied Stop: " + str(long_implied_stop_price))
         print("And this is how much I have left: " + str(capital))
         print("I am in this sh!t for long!!!!")
         print("------------------------------")
-        counter += 1
     
 
-    return [in_position_long, long_stop_loss_price, long_implied_stop_price, capital, num_of_shares, last_ent_p, counter]
+    return [in_position_long, long_stop_loss_price, long_implied_stop_price, capital, num_of_shares]
 
 
 def entry_short_check(stock_data, day_period, capital, num_of_shares, r_perc):
-    global in_position_short, short_stop_loss_price, short_implied_stop_price, last_ent_p, counter
+    global in_position_short, short_stop_loss_price, short_implied_stop_price, last_ent_p, scaling_short_atr
 
     lowest_price = get_lowest_price(stock_data, day_period)
 
@@ -109,6 +110,7 @@ def entry_short_check(stock_data, day_period, capital, num_of_shares, r_perc):
 
         if (capital > 0):
             atr = calc_atr(stock_data, day_period)
+            scaling_short_atr = atr 
             num_of_shares = int((capital * 0.5 * r_perc - comission) / (2 * atr))
             costs = round(num_of_shares * stock_data[-1]['close'], 2)
             capital = round(capital - costs, 2)
@@ -116,22 +118,21 @@ def entry_short_check(stock_data, day_period, capital, num_of_shares, r_perc):
         short_stop_loss_price = set_stop_loss_short(stock_data, day_period)
         short_implied_stop_price = set_implied_stop_short(stock_data, day_period)
 
-        print("Today's close price: " + str(stock_data[-1]['close']) + "  Today's date: " + stock_data[-1]['date'][0:10] + " In position: " + str(in_position_short))
+        print("Today's close price: " + str(stock_data[-1]['close']) + "  Today's date: " + stock_data[-1]['date'][0:10] + " In position short: " + str(in_position_short) + "This is the first short entry!")
         #print("Lowest price: " + str(lowest_price))
         print("Go in and don't look back! Costs: " + str(costs))
         print("Stop loss: " + str(short_stop_loss_price) + " Implied Stop: " + str(short_implied_stop_price))
         print("And this is how much I have left: " + str(capital))
         print("Short hoes never a problem!!!!")
         print("------------------------------")
-        counter += 1
 
-    return [in_position_short, short_stop_loss_price, short_implied_stop_price, capital, num_of_shares, last_ent_p, counter]
+    return [in_position_short, short_stop_loss_price, short_implied_stop_price, capital, num_of_shares]
 
 
 
 
 def exit_long_check(stock_data, capital, num_of_shares):
-    global in_position_long, long_stop_loss_price, long_implied_stop_price, last_ent_p, counter
+    global in_position_long, long_stop_loss_price, long_implied_stop_price, last_ent_p, scaling_long_atr
 
     if(stock_data[-1]['close'] < long_stop_loss_price):
         in_position_long = False
@@ -144,7 +145,7 @@ def exit_long_check(stock_data, capital, num_of_shares):
         print("------------------------------")
         long_stop_loss_price = 0
         last_ent_p = 0
-        counter = 0
+        scaling_long_atr = 0
 
     elif(stock_data[-1]['close'] < long_implied_stop_price):
         in_position_long = False
@@ -156,17 +157,17 @@ def exit_long_check(stock_data, capital, num_of_shares):
         print("My capital is now: " + str(capital))
         print("------------------------------")
         long_implied_stop_price = 0
-        counter = 0
         last_ent_p = 0
+        scaling_long_atr = 0
 
 
-    return [in_position_long, long_stop_loss_price, long_implied_stop_price, capital, num_of_shares, last_ent_p, counter]
+    return [in_position_long, long_stop_loss_price, long_implied_stop_price, capital, num_of_shares]
 
 
 
 
 def exit_short_check(stock_data, capital, num_of_shares):
-    global in_position_short, short_stop_loss_price, short_implied_stop_price, last_ent_p, counter
+    global in_position_short, short_stop_loss_price, short_implied_stop_price, last_ent_p, scaling_short_atr
 
     if(stock_data[-1]['close'] > short_stop_loss_price):
         in_position_short = False
@@ -178,8 +179,8 @@ def exit_short_check(stock_data, capital, num_of_shares):
         print("My capital is now: " + str(capital))
         print("------------------------------")
         short_stop_loss_price = 0
-        counter = 0
         last_ent_p = 0
+        scaling_short_atr = 0
 
     elif(stock_data[-1]['close'] > short_implied_stop_price):
         in_position_short = False
@@ -191,41 +192,69 @@ def exit_short_check(stock_data, capital, num_of_shares):
         print("My capital is now: " + str(capital))
         print("------------------------------")
         short_implied_stop_price = 0
-        counter = 0
         last_ent_p = 0
+        scaling_short_atr = 0
 
 
-    return [in_position_short, short_stop_loss_price, short_implied_stop_price, capital, num_of_shares, last_ent_p, counter]
+    return [in_position_short, short_stop_loss_price, short_implied_stop_price, capital, num_of_shares]
 
     
 def scaling_long(stock_data, day_period, capital, num_of_shares, r_perc):
-    global in_position_short, long_stop_loss_price, long_implied_stop_price, last_ent_p, counter
+    global long_stop_loss_price, long_implied_stop_price, last_ent_p, scaling_long_atr
 
-    atr = calc_atr(stock_data, day_period)
-    if (counter <= 4):
-        if(stock_data[-1]['close'] >= (last_ent_p + atr * 2)):
-            last_ent_p = stock_data[-1]['close']
-            if (capital > 0):
-                num_of_shares = int((capital * 0.5 * r_perc - comission) / (2 * atr))
-                costs = round(num_of_shares * stock_data[-1]['close'], 2)
-                capital = round(capital - costs, 2)
+    scaling_long = False
+    atr = scaling_long_atr
+    if(stock_data[-1]['close'] >= (last_ent_p + scaling_long_atr * 2)):
+        scaling_long = True
+        if (capital > 0):
+            num_of_shares = int((capital * 0.5 * r_perc - comission) / (2 * atr))
+            costs = round(num_of_shares * stock_data[-1]['close'], 2)
+            capital = round(capital - costs, 2)
 
-            long_stop_loss_price = set_stop_loss_long(stock_data, day_period)
-            long_implied_stop_price = set_implied_stop_long(stock_data, day_period)
+        long_stop_loss_price = set_stop_loss_long(stock_data, day_period)
+        long_implied_stop_price = set_implied_stop_long(stock_data, day_period)
 
-            #print("Today's close price: " + str(stock_data[-1]['close']) + "  Today's date: " + stock_data[-1]['date'][0:10] + " In position: " + str(in_position_long))
-            #print("Highest price: " + str(highest_price))
-            #print("Go in and don't look back! Costs: " + str(costs))
-            #print("Stop loss: " + str(long_stop_loss_price) + " Implied Stop: " + str(long_implied_stop_price))
-            #print("And this is how much I have left: " + str(capital))
-            #print("I am in this sh!t for long!!!!")
-            print("Scaling long is working bitches!!!!")
-            print("------------------------------")
-            counter += 1
+        print("Today's close price: " + str(stock_data[-1]['close']) + "  Today's date: " + stock_data[-1]['date'][0:10] + "  In position: " + str(in_position_long) + "  Scaling long: " + str(scaling_long))
+        print("The price for scaling was: " + str(last_ent_p + scaling_long_atr * 2))
+        print("Go in and don't look back! Costs: " + str(costs))
+        print("Stop loss: " + str(long_stop_loss_price) + " Implied Stop: " + str(long_implied_stop_price))
+        print("And this is how much I have left: " + str(capital))
+        #print("I am in this sh!t for long!!!!")
+        print("Scaling long is working bitches!!!!")
+        print("------------------------------")
+        last_ent_p = stock_data[-1]['close']
     
-    return [in_position_long, long_stop_loss_price, long_implied_stop_price, capital, num_of_shares, last_ent_p, counter]
+    return [scaling_long, long_stop_loss_price, long_implied_stop_price, capital, num_of_shares]
     
 
+    
+    
+def scaling_short(stock_data, day_period, capital, num_of_shares, r_perc):
+    global short_stop_loss_price, short_implied_stop_price, last_ent_p, scaling_short_atr
+
+    scaling_short = False
+    atr = scaling_short_atr
+    if(stock_data[-1]['close'] <= (last_ent_p - scaling_short_atr * 2)):
+        scaling_short = True
+        if (capital > 0):
+            num_of_shares = int((capital * 0.5 * r_perc - comission) / (2 * atr))
+            costs = round(num_of_shares * stock_data[-1]['close'], 2)
+            capital = round(capital - costs, 2)
+
+        short_stop_loss_price = set_stop_loss_short(stock_data, day_period)
+        short_implied_stop_price = set_implied_stop_short(stock_data, day_period)
+
+        print("Today's close price: " + str(stock_data[-1]['close']) + "  Today's date: " + stock_data[-1]['date'][0:10] + "  In position: " + str(in_position_short) + "  Scaling short: " + str(scaling_short))
+        print("The price for scaling was: " + str(last_ent_p - scaling_short_atr * 2))
+        print("Go in and don't look back! Costs: " + str(costs))
+        print("Stop loss: " + str(short_stop_loss_price) + " Implied Stop: " + str(short_implied_stop_price))
+        print("And this is how much I have left: " + str(capital))
+        #print("I am in this sh!t for long!!!!")
+        print("Scaling short is working bitches!!!!")
+        print("------------------------------")
+        last_ent_p = stock_data[-1]['close']
+    
+    return [scaling_long, long_stop_loss_price, long_implied_stop_price, capital, num_of_shares]
     
 
 
