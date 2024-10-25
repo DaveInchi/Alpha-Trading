@@ -10,7 +10,7 @@ implied_stop_price = 0
 s1_days = 20
 capital = 500000
 num_of_shares = 0
-r_perc = 0.02
+r_perc = 0.01
 
 counter = 0
 
@@ -29,7 +29,7 @@ def turtle_check(stock_data, day_period):
     for i in range(day_period - 1, len(stock_data)):
         if(not in_position_short):
             if(counter == 0):
-                entry_long_check_params = entry_long_check(stock_data[switch:i], day_period, capital, num_of_shares, r_perc)
+                entry_long_check_params = entry_long_check(stock_data[switch:i], day_period, capital, r_perc)
                 in_position_long = entry_long_check_params[0]
                 stop_loss = entry_long_check_params[1]
                 implied_stop_price = entry_long_check_params[2]
@@ -42,7 +42,7 @@ def turtle_check(stock_data, day_period):
 
 
             elif(counter != 0 and counter < 4):
-                scaling_long_params = scaling_long(stock_data[switch:i], day_period, capital, num_of_shares, r_perc)
+                scaling_long_params = scaling_long(stock_data[switch:i], day_period, capital, r_perc)
                 scaling_long_bool = scaling_long_params[0]
                 stop_loss = scaling_long_params[1]
                 implied_stop_price = scaling_long_params[2]
@@ -53,7 +53,7 @@ def turtle_check(stock_data, day_period):
                     counter += 1
 
                 else:
-                    exit_long_check_params = exit_long_check(stock_data[switch:i], capital, num_of_shares)
+                    exit_long_check_params = exit_long_check(stock_data[switch:i], capital)
                     in_position_long = exit_long_check_params[0]
                     stop_loss = exit_long_check_params[1]
                     implied_stop_price = exit_long_check_params[2]
@@ -68,7 +68,7 @@ def turtle_check(stock_data, day_period):
 
         if(not in_position_long):
             if(counter == 0):
-                entry_short_check_params = entry_short_check(stock_data[switch:i], day_period, capital, num_of_shares, r_perc)
+                entry_short_check_params = entry_short_check(stock_data[switch:i], day_period, capital, r_perc)
                 in_position_short = entry_short_check_params[0]
                 stop_loss = entry_short_check_params[1]
                 implied_stop_price = entry_short_check_params[2]
@@ -81,7 +81,7 @@ def turtle_check(stock_data, day_period):
 
 
             elif(counter != 0 and counter < 4):
-                scaling_short_params = scaling_short(stock_data[switch:i], day_period, capital, num_of_shares, r_perc)
+                scaling_short_params = scaling_short(stock_data[switch:i], day_period, capital, r_perc)
                 scaling_short_bool = scaling_short_params[0]
                 stop_loss = scaling_short_params[1]
                 implied_stop_price = scaling_short_params[2]
@@ -92,7 +92,7 @@ def turtle_check(stock_data, day_period):
                     counter += 1
 
                 else:
-                    exit_short_check_params = exit_short_check(stock_data[switch:i], capital, num_of_shares)
+                    exit_short_check_params = exit_short_check(stock_data[switch:i], capital)
                     in_position_short = exit_short_check_params[0]
                     stop_loss = exit_short_check_params[1]
                     implied_stop_price = exit_short_check_params[2]
