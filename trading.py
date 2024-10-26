@@ -11,10 +11,12 @@ long_stop_loss_price = 0
 long_implied_stop_price = 0
 short_stop_loss_price = 0
 short_implied_stop_price = 0
+
+starting_capital = 500000
 comission = 0
 num_of_shares = 0
 pnl = 0
-total_pnl = 0
+total_realized_pnl = 0
 
 last_ent_p = 0
 scaling_long_atr = 0
@@ -85,7 +87,6 @@ def entry_long_check(stock_data, day_period, capital, r_perc):
             atr = calc_atr(stock_data, day_period)
             scaling_long_atr = atr
             num_of_shares += int((capital * r_perc - comission) / (2 * atr))
-            pnl = calc_pnl(stock_data, last_ent_p, num_of_shares)
             costs = round(num_of_shares * stock_data[-1]['close'], 2)
             capital = round(capital - costs, 2)
 
@@ -97,7 +98,6 @@ def entry_long_check(stock_data, day_period, capital, r_perc):
         print("Go in and don't look back! Costs: " + str(costs))
         print("Stop loss: " + str(long_stop_loss_price) + " Implied Stop: " + str(long_implied_stop_price))
         print("And this is how much I have left: " + str(capital))
-        print("PnL: " + str(pnl))
         print("I am in this sh!t for long!!!!")
         print("------------------------------")
     
@@ -119,7 +119,6 @@ def entry_short_check(stock_data, day_period, capital, r_perc):
             atr = calc_atr(stock_data, day_period)
             scaling_short_atr = atr 
             num_of_shares += int((capital * r_perc - comission) / (2 * atr))
-            pnl = calc_pnl(stock_data, last_ent_p, num_of_shares)
             costs = round(num_of_shares * stock_data[-1]['close'], 2)
             capital = round(capital - costs, 2)
 
@@ -131,7 +130,6 @@ def entry_short_check(stock_data, day_period, capital, r_perc):
         print("Go in and don't look back! Costs: " + str(costs))
         print("Stop loss: " + str(short_stop_loss_price) + " Implied Stop: " + str(short_implied_stop_price))
         print("And this is how much I have left: " + str(capital))
-        print("PnL: " + str(pnl))
         print("Short hoes never a problem!!!!")
         print("------------------------------")
 
@@ -141,37 +139,40 @@ def entry_short_check(stock_data, day_period, capital, r_perc):
 
 
 def exit_long_check(stock_data, capital):
-    global in_position_long, long_stop_loss_price, long_implied_stop_price, last_ent_p, scaling_long_atr, total_pnl, pnl, num_of_shares
+    global in_position_long, long_stop_loss_price, long_implied_stop_price, last_ent_p, scaling_long_atr, total_realized_pnl, pnl, num_of_shares
 
     if(stock_data[-1]['close'] < long_stop_loss_price):
         in_position_long = False
-        pnl = calc_pnl(stock_data, last_ent_p, num_of_shares)
         costs = round(num_of_shares * stock_data[-1]['close'], 2)
         capital += round(capital + costs, 2)
-        total_pnl += pnl
+        pnl = round(capital - starting_capital, 2)
+        total_realized_pnl += pnl
         print("Today's close price: " + str(stock_data[-1]['close']) + "  Today's date: " + stock_data[-1]['date'][0:10] + " In position: " + str(in_position_long))
         print("Stop loss hit: " + str(long_stop_loss_price))
         print("Go out while you can, exited long trade!)")
-        print("PnL: " + str(pnl))
+        print("Total PnL: " + str(total_realized_pnl))
         print("My capital is now: " + str(capital))
         print("------------------------------")
         num_of_shares = 0
+        pnl = 0
         long_stop_loss_price = 0
         last_ent_p = 0
         scaling_long_atr = 0
 
     elif(stock_data[-1]['close'] < long_implied_stop_price):
         in_position_long = False
-        pnl = calc_pnl(stock_data, last_ent_p, num_of_shares)
         costs = round(num_of_shares * stock_data[-1]['close'], 2)
         capital += round(capital + costs, 2)
-        total_pnl += pnl
+        pnl = round(capital - starting_capital, 2)
+        total_realized_pnl += pnl
         print("Today's close price: " + str(stock_data[-1]['close']) + "  Today's date: " + stock_data[-1]['date'][0:10] + " In position: " + str(in_position_long))
         print("Implied stop hit: " + str(long_implied_stop_price))
         print("Go out while you can, exited long trade!)")
+        print("Total PnL: " + str(total_realized_pnl))
         print("My capital is now: " + str(capital))
         print("------------------------------")
         num_of_shares = 0
+        pnl = 0
         long_implied_stop_price = 0
         last_ent_p = 0
         scaling_long_atr = 0
@@ -183,36 +184,40 @@ def exit_long_check(stock_data, capital):
 
 
 def exit_short_check(stock_data, capital):
-    global in_position_short, short_stop_loss_price, short_implied_stop_price, last_ent_p, scaling_short_atr, total_pnl, pnl, num_of_shares
+    global in_position_short, short_stop_loss_price, short_implied_stop_price, last_ent_p, scaling_short_atr, total_realized_pnl, pnl, num_of_shares
 
     if(stock_data[-1]['close'] > short_stop_loss_price):
         in_position_short = False
-        pnl = calc_pnl(stock_data, last_ent_p, num_of_shares)
-        total_pnl += pnl
+        pnl += round(calc_pnl(last_ent_p, stock_data[-1]['close'], num_of_shares), 2)
+        total_realized_pnl += pnl
         costs = round(num_of_shares * stock_data[-1]['close'], 2)
         capital += round(capital + costs, 2)
         print("Today's close price: " + str(stock_data[-1]['close']) + "  Today's date: " + stock_data[-1]['date'][0:10] + " In position: " + str(in_position_short))
         print("Stop loss hit: " + str(short_stop_loss_price))
         print("Go out while you can, exited short trade!)")
+        print("Total PnL: " + str(total_realized_pnl))
         print("My capital is now: " + str(capital))
         print("------------------------------")
         num_of_shares = 0
+        pnl = 0
         short_stop_loss_price = 0
         last_ent_p = 0
         scaling_short_atr = 0
 
     elif(stock_data[-1]['close'] > short_implied_stop_price):
         in_position_short = False
-        pnl = calc_pnl(stock_data, last_ent_p, num_of_shares)
-        total_pnl += pnl_calc
+        pnl += round(calc_pnl(last_ent_p, stock_data[-1]['close'], num_of_shares), 2)
+        total_realized_pnl += pnl_calc
         costs = round(num_of_shares * stock_data[-1]['close'], 2)
         capital += round(capital + costs, 2)
         print("Today's close price: " + str(stock_data[-1]['close']) + "  Today's date: " + stock_data[-1]['date'][0:10] + " In position: " + str(in_position_short))
         print("Implied stop hit: " + str(short_implied_stop_price))
         print("Go out while you can, exited long trade!)")
+        print("Total PnL: " + str(total_realized_pnl))
         print("My capital is now: " + str(capital))
         print("------------------------------")
         num_of_shares = 0
+        pnl = 0
         short_implied_stop_price = 0
         last_ent_p = 0
         scaling_short_atr = 0
