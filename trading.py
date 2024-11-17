@@ -149,15 +149,14 @@ def entry_short_check(stock_data, day_period):
 
 def exit_long_check(stock_data):
     global in_position_long, long_stop_loss_price, long_implied_stop_price, last_ent_p, scaling_long_atr, total_realized_pnl, entry_prices_avg, num_of_shares, counter
-
     if(stock_data[-1]['close'] < long_stop_loss_price):
         in_position_long = False
-        total_realized_pnl += round((stock_data[-1]['close'] - entry_prices_avg/counter) * num_of_shares, 2)
+        total_realized_pnl = round(total_realized_pnl + (stock_data[-1]['close'] - entry_prices_avg/counter) * num_of_shares, 2)
         counter = 0
         print("Today's close price: " + str(stock_data[-1]['close']) + "  Today's date: " + stock_data[-1]['date'][0:10] + " In position: " + str(in_position_long))
         print("Stop loss hit: " + str(long_stop_loss_price))
         print("Go out while you can, exited long trade!)")
-        print("My realized pnl: " + str(total_realized_pnl))
+        print("My realized pnl: " + str(round(total_realized_pnl, 2)))
         print("Counter: " + str(counter))
         print("------------------------------")
         num_of_shares = 0
@@ -169,7 +168,7 @@ def exit_long_check(stock_data):
 
     elif(stock_data[-1]['close'] < long_implied_stop_price):
         in_position_long = False
-        total_realized_pnl += round((stock_data[-1]['close'] - entry_prices_avg/counter) * num_of_shares, 2)
+        total_realized_pnl = round(total_realized_pnl + (stock_data[-1]['close'] - entry_prices_avg/counter) * num_of_shares, 2)
         counter = 0
         print("Today's close price: " + str(stock_data[-1]['close']) + "  Today's date: " + stock_data[-1]['date'][0:10] + " In position: " + str(in_position_long))
         print("Implied stop hit: " + str(long_implied_stop_price))
@@ -194,7 +193,7 @@ def exit_short_check(stock_data):
 
     if(stock_data[-1]['close'] > short_stop_loss_price):
         in_position_short = False
-        total_realized_pnl += round((entry_prices_avg/counter - stock_data[-1]['close']) * num_of_shares, 2)
+        total_realized_pnl = round(total_realized_pnl + (entry_prices_avg/counter - stock_data[-1]['close']) * num_of_shares, 2)
         counter = 0
         print("Today's close price: " + str(stock_data[-1]['close']) + "  Today's date: " + stock_data[-1]['date'][0:10] + " In position: " + str(in_position_short))
         print("Stop loss hit: " + str(short_stop_loss_price))
@@ -210,7 +209,7 @@ def exit_short_check(stock_data):
 
     elif(stock_data[-1]['close'] > short_implied_stop_price):
         in_position_short = False
-        total_realized_pnl += round((entry_prices_avg/counter - stock_data[-1]['close']) * num_of_shares, 2)
+        total_realized_pnl = round(total_realized_pnl + (entry_prices_avg/counter - stock_data[-1]['close']) * num_of_shares, 2)
         counter = 0
         print("Today's close price: " + str(stock_data[-1]['close']) + "  Today's date: " + stock_data[-1]['date'][0:10] + " In position: " + str(in_position_short))
         print("Implied stop hit: " + str(short_implied_stop_price))

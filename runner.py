@@ -20,25 +20,25 @@ def turtle_check(stock_data, day_period):
 
     for i in range(day_period - 1, len(stock_data)):
         if(not in_position_short):
-            in_position_long = entry_long_check(stock_data[switch:i], day_period)
+            in_position_long = entry_long_check(stock_data[switch:i + 1], day_period)
 
             if(in_position_long):
-                scaling_long_bool = scaling_long(stock_data[switch:i], day_period)
+                scaling_long_bool = scaling_long(stock_data[switch:i + 1], day_period)
 
                 if(scaling_long_bool == False):
-                    in_position_long = exit_long_check(stock_data[switch:i])
+                    in_position_long = exit_long_check(stock_data[switch:i + 1])
                     
 
 
 
         if(not in_position_long):
-            in_position_short = entry_short_check(stock_data[switch:i], day_period)
+            in_position_short = entry_short_check(stock_data[switch:i + 1], day_period)
 
             if(in_position_short):
-                scaling_short_bool = scaling_short(stock_data[switch:i], day_period)
+                scaling_short_bool = scaling_short(stock_data[switch:i + 1], day_period)
 
                 if(scaling_short_bool == False):
-                    in_position_short = exit_short_check(stock_data[switch:i])
+                    in_position_short = exit_short_check(stock_data[switch:i + 1])
 
 
         switch += 1
@@ -57,7 +57,7 @@ def turtle_check(stock_data, day_period):
 
 
 
-stockdata = get_hystory_data('SPY', 1)
+stockdata = get_hystory_data('SPY', 2)
 reversed_stockdata = stockdata[::-1]
 turtle_check(reversed_stockdata, 20)
 
