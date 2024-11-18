@@ -57,7 +57,7 @@ def turtle_check(stock_data, day_period):
 
 
 
-stockdata = get_hystory_data('SPY', 2)
+stockdata = get_hystory_data('SPY', 1)
 reversed_stockdata = stockdata[::-1]
-turtle_check(reversed_stockdata, 20)
+turtle_check(reversed_stockdata, s1_days)
 

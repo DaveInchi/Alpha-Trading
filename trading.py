@@ -4,8 +4,6 @@ from utils.atr_calc import calc_atr
 from utils.hystory_data_loader import get_hystory_data
 from utils.pnl_calc import calc_pnl
 
-s1_period = 20
-
 in_position_long = False
 in_position_short = False
 long_stop_loss_price = 0
@@ -233,7 +231,7 @@ def scaling_long(stock_data, day_period):
     scaling_long = False
     num_of_shares_scaling_long = 0
     if(counter != 0 and counter < 4):
-        if(stock_data[-1]['close'] >= (last_ent_p + scaling_long_atr * 2)):
+        if(stock_data[-1]['close'] >= (last_ent_p + scaling_long_atr / 2)):
             scaling_long = True
             atr = calc_atr(stock_data, day_period)
             num_of_shares_scaling_long += int((risk_value - comission) / (2 * atr))
@@ -246,7 +244,7 @@ def scaling_long(stock_data, day_period):
             long_implied_stop_price = set_implied_stop_long(stock_data, day_period)
 
             print("Today's close price: " + str(stock_data[-1]['close']) + "  Today's date: " + stock_data[-1]['date'][0:10] + "  In position: " + str(in_position_long) + "  Scaling long: " + str(scaling_long))
-            print("The price for scaling was: " + str(round(last_ent_p + scaling_long_atr * 2)))
+            print("The price for scaling was: " + str(round(last_ent_p + scaling_long_atr / 2)))
             print("Stop loss: " + str(long_stop_loss_price) + " Implied Stop: " + str(long_implied_stop_price))
             print("My unrealized pnl: " + str(total_unrealized_pnl))
             print("Counter: " + str(counter))
@@ -255,6 +253,7 @@ def scaling_long(stock_data, day_period):
             print("Shares in this position: " + str(num_of_shares))
             print("------------------------------")
             last_ent_p = stock_data[-1]['close']
+            scaling_long_atr = atr
     
     return scaling_long
     
@@ -267,7 +266,7 @@ def scaling_short(stock_data, day_period):
     scaling_short = False
     num_of_shares_scaling_short = 0
     if(counter != 0 and counter < 4):
-        if(stock_data[-1]['close'] <= (last_ent_p - scaling_short_atr * 2)):
+        if(stock_data[-1]['close'] <= (last_ent_p - scaling_short_atr / 2)):
             scaling_short = True
             atr = calc_atr(stock_data, day_period)
             num_of_shares_scaling_short += int((risk_value - comission) / (2 * atr))
@@ -280,7 +279,7 @@ def scaling_short(stock_data, day_period):
             short_implied_stop_price = set_implied_stop_short(stock_data, day_period)
 
             print("Today's close price: " + str(stock_data[-1]['close']) + "  Today's date: " + stock_data[-1]['date'][0:10] + "  In position: " + str(in_position_short) + "  Scaling short: " + str(scaling_short))
-            print("The price for scaling was: " + str(round(last_ent_p - scaling_short_atr * 2)))
+            print("The price for scaling was: " + str(round(last_ent_p - scaling_short_atr / 2)))
             print("Stop loss: " + str(short_stop_loss_price) + " Implied Stop: " + str(short_implied_stop_price))
             print("My unrealized pnl: " + str(total_unrealized_pnl))
             print("Counter: " + str(counter))
@@ -289,6 +288,7 @@ def scaling_short(stock_data, day_period):
             print("Scaling short is working bitches!!!!")
             print("------------------------------")
             last_ent_p = stock_data[-1]['close']
+            scaling_short_atr = atr
     
     return scaling_short
     
