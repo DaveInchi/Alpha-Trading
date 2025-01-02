@@ -244,7 +244,7 @@ def scaling_long(stock_data, day_period):
             long_implied_stop_price = set_implied_stop_long(stock_data, day_period)
 
             print("Today's close price: " + str(stock_data[-1]['close']) + "  Today's date: " + stock_data[-1]['date'][0:10] + "  In position: " + str(in_position_long) + "  Scaling long: " + str(scaling_long))
-            print("The price for scaling was: " + str(round(last_ent_p + scaling_long_atr / 2)))
+            print("The price for scaling was: " + str(round(last_ent_p + scaling_long_atr / 2, 2)))
             print("Stop loss: " + str(long_stop_loss_price) + " Implied Stop: " + str(long_implied_stop_price))
             print("My unrealized pnl: " + str(total_unrealized_pnl))
             print("Counter: " + str(counter))

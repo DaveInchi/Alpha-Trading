@@ -5,7 +5,7 @@ from utils.atr_calc import calc_atr
 from utils.hystory_data_loader import get_hystory_data
 from trading import *
 
-s1_days = 20
+s1_days = 50
 
 
 
