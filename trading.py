@@ -145,8 +145,9 @@ def entry_short_check(stock_data, day_period):
 
 
 
-def exit_long_check(stock_data):
+def exit_long_check(stock_data, day_period):
     global in_position_long, long_stop_loss_price, long_implied_stop_price, last_ent_p, scaling_long_atr, total_realized_pnl, entry_prices_avg, num_of_shares, counter
+    long_implied_stop_price = set_implied_stop_long(stock_data, day_period)
     if(stock_data[-1]['close'] < long_stop_loss_price):
         in_position_long = False
         total_realized_pnl = round(total_realized_pnl + (stock_data[-1]['close'] - entry_prices_avg/counter) * num_of_shares, 2)
@@ -186,9 +187,9 @@ def exit_long_check(stock_data):
 
 
 
-def exit_short_check(stock_data):
+def exit_short_check(stock_data, day_period):
     global in_position_short, short_stop_loss_price, short_implied_stop_price, last_ent_p, scaling_short_atr, total_realized_pnl, entry_prices_avg, num_of_shares, counter 
-
+    short_implied_stop_price = set_implied_stop_short(stock_data, day_period)
     if(stock_data[-1]['close'] > short_stop_loss_price):
         in_position_short = False
         total_realized_pnl = round(total_realized_pnl + (entry_prices_avg/counter - stock_data[-1]['close']) * num_of_shares, 2)
