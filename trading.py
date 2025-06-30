@@ -4,6 +4,10 @@ from utils.atr_calc import calc_atr
 from utils.hystory_data_loader import get_hystory_data
 from utils.pnl_calc import calc_pnl
 
+# Constants
+atr_scaling_factor = 1.5
+entry_count_limit = 4
+
 # Global variables
 in_position_long = False
 in_position_short = False
@@ -171,7 +175,7 @@ def scaling_long(stock_data, day_period):
     global total_unrealized_pnl, entry_prices_avg, num_of_shares, counter
 
     scaling_long = False
-    if 0 < counter < 4 and stock_data[-1]['close'] >= (last_entry_price + scaling_long_atr / 2):
+    if 0 < counter < entry_count_limit and stock_data[-1]['close'] >= (last_entry_price + scaling_long_atr * atr_scaling_factor):
         scaling_long = True
         atr = calc_atr(stock_data, day_period)
         num_shares_added = int((risk_value - commission) / (2 * atr))
@@ -201,7 +205,7 @@ def scaling_short(stock_data, day_period):
     global total_unrealized_pnl, entry_prices_avg, num_of_shares, counter
 
     scaling_short = False
-    if 0 < counter < 4 and stock_data[-1]['close'] <= (last_entry_price - scaling_short_atr / 2):
+    if 0 < counter < entry_count_limit and stock_data[-1]['close'] <= (last_entry_price - scaling_short_atr * atr_scaling_factor):
         scaling_short = True
         atr = calc_atr(stock_data, day_period)
         num_shares_added = int((risk_value - commission) / (2 * atr))
