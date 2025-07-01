@@ -5,8 +5,9 @@ from utils.hystory_data_loader import get_hystory_data
 from utils.pnl_calc import calc_pnl
 
 # Constants
-atr_scaling_factor = 1.5
-entry_count_limit = 4
+atr_scaling_factor = 1
+entry_count_limit = 1
+stop_loss_factor = 1.5
 
 # Global variables
 in_position_long = False
@@ -38,12 +39,12 @@ def get_lowest_price(stock_data, day_period):
 def set_stop_loss_long(stock_data, day_period):
     """Sets the stop loss for long positions based on ATR and current closing price."""
     atr = calc_atr(stock_data, day_period)
-    return round(stock_data[-1]['close'] - (atr * 2), 2)
+    return round(stock_data[-1]['close'] - (atr * stop_loss_factor), 2)
 
 def set_stop_loss_short(stock_data, day_period):
     """Sets the stop loss for short positions based on ATR and current closing price."""
     atr = calc_atr(stock_data, day_period)
-    return round(stock_data[-1]['close'] + (atr * 2), 2)
+    return round(stock_data[-1]['close'] + (atr * stop_loss_factor), 2)
 
 def set_implied_stop_long(stock_data, day_period):
     """Sets the implied stop for long position based on recent closing prices."""

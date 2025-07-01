@@ -4,7 +4,8 @@ from utils.atr_calc import calc_atr
 from utils.hystory_data_loader import get_hystory_data
 from trading import *
 
-S1_DAYS = 55
+S1_DAYS = 100
+time_frame = 13
 
 def turtle_check(stock_data, day_period):
     """Executes the turtle trading strategy over the given stock data."""
@@ -34,5 +35,5 @@ def turtle_check(stock_data, day_period):
     print("-" * 30)
 
 if __name__ == "__main__":
-    stock_data = get_hystory_data('SPY', 2)[::-1]
+    stock_data = get_hystory_data('SPY', time_frame)[::-1]
     turtle_check(stock_data, S1_DAYS)
